@@ -62,7 +62,15 @@ export async function POST(req: Request) {
   } catch (err) {
     if (err instanceof LlmError) {
       const status =
-        err.code === "missing_key" ? 503 : err.code === "rate_limit" ? 429 : err.code === "timeout" ? 504 : 502;
+        err.code === "missing_key"
+          ? 503
+          : err.code === "auth"
+            ? 402
+            : err.code === "rate_limit"
+              ? 429
+              : err.code === "timeout"
+                ? 504
+                : 502;
       return NextResponse.json({ error: err.message, code: err.code }, { status });
     }
     return NextResponse.json({ error: "Unexpected chat error." }, { status: 500 });

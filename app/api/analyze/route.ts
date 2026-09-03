@@ -7,12 +7,14 @@ import { applyRules } from "@/lib/rules/engine";
 import type { AnalyzeResponse, TeamContext } from "@/lib/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 function errorStatus(code: LlmError["code"]): number {
   switch (code) {
     case "missing_key":
       return 503;
+    case "auth":
+      return 402;
     case "timeout":
       return 504;
     case "rate_limit":
@@ -57,7 +59,9 @@ export async function POST(req: Request) {
         { role: "system", content: MENTOR_SYSTEM_PROMPT },
         { role: "user", content: userPrompt },
       ],
-      { json: true, temperature: 0.55, timeoutMs: 55_000, maxTokens: 4000 }
+      // Large structured report + models that "think" need real headroom, or
+      // the JSON gets truncated mid-object and fails validation.
+      { json: true, temperature: 0.55, timeoutMs: 90_000, maxTokens: 12000 }
     );
   } catch (err) {
     if (err instanceof LlmError) {

@@ -21,6 +21,7 @@ export class LlmError extends Error {
     message: string,
     public code:
       | "missing_key"
+      | "auth"
       | "timeout"
       | "rate_limit"
       | "bad_response"
@@ -64,9 +65,6 @@ export async function chatCompletion(
     );
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), opts.timeoutMs ?? 60_000);
-
   const body: Record<string, unknown> = {
     model,
     messages,
@@ -75,48 +73,127 @@ export async function chatCompletion(
   if (opts.maxTokens) body.max_tokens = opts.maxTokens;
   if (opts.json) body.response_format = { type: "json_object" };
 
-  let res: Response;
-  try {
-    res = await fetch(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-  } catch (err: any) {
-    clearTimeout(timeout);
-    if (err?.name === "AbortError") {
-      throw new LlmError("The mentor took too long to respond. Please try again.", "timeout");
-    }
-    throw new LlmError("Could not reach the LLM provider.", "network");
-  }
-  clearTimeout(timeout);
+  // Transient failures (503 overload, 500, network blips, empty bodies) are
+  // common on free tiers — retry a few times with backoff before giving up.
+  const maxAttempts = 3;
+  let lastTransient: LlmError | null = null;
 
-  if (res.status === 429) {
-    throw new LlmError("The provider is rate-limiting requests. Wait a moment and retry.", "rate_limit");
-  }
-  if (!res.ok) {
-    // Some providers reject json response_format; retry once without it.
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), opts.timeoutMs ?? 60_000);
+
+    let res: Response;
+    try {
+      res = await fetch(`${baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+    } catch (err: any) {
+      clearTimeout(timeout);
+      if (err?.name === "AbortError") {
+        throw new LlmError("The mentor took too long to respond. Please try again.", "timeout");
+      }
+      lastTransient = new LlmError("Could not reach the LLM provider.", "network");
+      if (attempt < maxAttempts) {
+        await sleep(attempt * 700);
+        continue;
+      }
+      throw lastTransient;
+    }
+    clearTimeout(timeout);
+
+    if (res.status === 429) {
+      throw new LlmError("The provider is rate-limiting requests. Wait a moment and retry.", "rate_limit");
+    }
+    if (res.status === 401 || res.status === 403) {
+      // Auth/account problem: bad key, no model access, or (common on a fresh
+      // account) no credits/billing. Surface the provider's own message.
+      const detail = await readErrorDetail(res);
+      const base =
+        res.status === 401
+          ? "The provider rejected the API key (401). Check LLM_API_KEY is correct and active."
+          : "The provider denied the request (403) — often no credits/billing on the account, or the key can't access this model.";
+      throw new LlmError(detail ? `${base} Provider said: ${detail}` : base, "auth");
+    }
+    // Some providers reject json response_format; drop it and retry once.
     if (opts.json && (res.status === 400 || res.status === 422)) {
       const { json, ...rest } = opts;
       return chatCompletion(messages, rest);
     }
-    throw new LlmError(`The LLM provider returned an error (${res.status}).`, "upstream");
+    // Retryable server-side errors.
+    if (res.status === 500 || res.status === 502 || res.status === 503 || res.status === 504) {
+      const detail = await readErrorDetail(res);
+      lastTransient = new LlmError(
+        detail
+          ? `The LLM provider is temporarily unavailable (${res.status}): ${detail}`
+          : `The LLM provider is temporarily unavailable (${res.status}).`,
+        "upstream"
+      );
+      if (attempt < maxAttempts) {
+        await sleep(attempt * 900);
+        continue;
+      }
+      throw lastTransient;
+    }
+    if (!res.ok) {
+      const detail = await readErrorDetail(res);
+      throw new LlmError(
+        detail
+          ? `The LLM provider returned an error (${res.status}): ${detail}`
+          : `The LLM provider returned an error (${res.status}).`,
+        "upstream"
+      );
+    }
+
+    let data: any;
+    try {
+      data = await res.json();
+    } catch {
+      throw new LlmError("The LLM provider returned an unreadable response.", "bad_response");
+    }
+
+    const choice = data?.choices?.[0];
+    const content = choice?.message?.content;
+
+    // Truncated output (hit the token cap mid-JSON) — the caller can't parse
+    // it. Report it clearly rather than as a generic structuring failure.
+    if (choice?.finish_reason === "length") {
+      throw new LlmError(
+        "The response was cut off before it finished (token limit). Try again, or shorten the problem statement.",
+        "bad_response"
+      );
+    }
+
+    if (typeof content !== "string" || content.trim().length === 0) {
+      // Empty body can be a transient hiccup — retry.
+      lastTransient = new LlmError("The LLM provider returned an empty response.", "bad_response");
+      if (attempt < maxAttempts) {
+        await sleep(attempt * 700);
+        continue;
+      }
+      throw lastTransient;
+    }
+
+    return content;
   }
 
-  let data: any;
+  throw lastTransient ?? new LlmError("The LLM provider request failed.", "upstream");
+}
+
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function readErrorDetail(res: Response): Promise<string> {
   try {
-    data = await res.json();
+    const body = await res.json();
+    return body?.error?.message || body?.error || body?.message || "";
   } catch {
-    throw new LlmError("The LLM provider returned an unreadable response.", "bad_response");
+    return "";
   }
-
-  const content = data?.choices?.[0]?.message?.content;
-  if (typeof content !== "string" || content.length === 0) {
-    throw new LlmError("The LLM provider returned an empty response.", "bad_response");
-  }
-  return content;
 }
