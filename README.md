@@ -1,7 +1,7 @@
-# Frost — Hackathon Mentor AI Assistant
+# Mewrin — Hackathon Mentor AI Assistant
 
 A polished conversational AI **mentor** for hackathon teams. Paste a problem
-statement and a little team context; Frost helps you understand the problem,
+statement and a little team context; Mewrin helps you understand the problem,
 identify users, apply design thinking, generate and prioritize features, choose
 feasible technology, validate assumptions, plan the build, and prepare a demo
 and jury pitch — **coaching the team instead of building the solution for it.**

@@ -7,7 +7,7 @@
  * Three.js / React Three Fiber creature can be dropped in without touching the
  * surrounding UI. To upgrade later: render an <R3FCompanion mood={mood}/> here
  * instead of the SVG, keeping the same props. The SVG below is an ORIGINAL,
- * license-free friendly "frost spark" mascot — not a copyrighted character.
+ * license-free friendly "Mewrin spark" mascot — not a copyrighted character.
  */
 
 export type CompanionMood = "idle" | "thinking" | "happy" | "speaking";
@@ -62,7 +62,7 @@ export function MentorCompanion({
             strokeOpacity="0.25"
             strokeWidth="1"
           />
-          {/* little frost/spark crest */}
+          {/* little Mewrin/spark crest */}
           <path
             d="M50 6 L54 16 L50 14 L46 16 Z"
             fill="#F0521B"

@@ -114,7 +114,7 @@ export function SetupForm({
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
               <Button onClick={submit} size="lg" disabled={!valid && touched}>
-                Analyze with Frost
+                Analyze with Mewrin
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
                   <path d="M3 8h9M8.5 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -130,7 +130,7 @@ export function SetupForm({
             <div className="flex items-center gap-3">
               <MentorCompanion mood="idle" size="md" />
               <div>
-                <div className="font-semibold text-ink">Frost</div>
+                <div className="font-semibold text-ink">Mewrin</div>
                 <div className="text-xs text-ink-soft">Your hackathon mentor</div>
               </div>
             </div>

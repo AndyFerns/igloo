@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Frost — Hackathon Mentor",
+  title: "Mewrin — Hackathon Mentor",
   description:
     "A calm, sharp AI mentor for hackathon teams. Paste a problem, get structured guidance: problem, users, ideas, MVP, tech, validation, demo and jury pitch.",
 };

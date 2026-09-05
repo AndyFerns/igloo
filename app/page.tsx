@@ -11,7 +11,7 @@ const STEPS = [
   },
   {
     n: "02",
-    title: "Frost retrieves & reasons",
+    title: "Mewrin retrieves & reasons",
     body: "It finds related SIH problems for context, then works through the problem the way a good mentor would.",
   },
   {
@@ -35,7 +35,7 @@ const SECTIONS = [
 ];
 
 const PRINCIPLES = [
-  ["Coaches, never ghost-writes", "Frost helps you think — it will not hand you a finished project to copy."],
+  ["Coaches, never ghost-writes", "Mewrin helps you think — it will not hand you a finished project to copy."],
   ["Everything has a why", "Every recommendation comes with its reasoning and trade-offs."],
   ["Assumptions stay honest", "Personas and claims are labelled as hypotheses that need validating."],
   ["Grounded in real context", "Related SIH problem statements are used as reference, never reproduced."],
@@ -59,7 +59,7 @@ export default function Landing() {
               <span className="text-ink-faint">Build the right</span> thing.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-ink-soft sm:text-lg">
-              Frost is a calm, sharp mentor for hackathon teams. Paste your problem statement and it
+              Mewrin is a calm, sharp mentor for hackathon teams. Paste your problem statement and it
               walks you from confusion to a demonstrable MVP and a jury-ready pitch — coaching your
               team instead of building the solution for you.
             </p>
@@ -92,7 +92,7 @@ export default function Landing() {
               <div className="mt-4 flex items-center gap-3 rounded-xl border border-line bg-canvas/60 p-3">
                 <MentorCompanion mood="happy" size="sm" />
                 <div>
-                  <div className="text-sm font-medium text-ink">Meet Frost</div>
+                  <div className="text-sm font-medium text-ink">Meet Mewrin</div>
                   <div className="text-xs text-ink-soft">
                     Your mentor companion — friendly, but it will challenge you.
                   </div>
@@ -159,7 +159,7 @@ export default function Landing() {
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-soft">
               The best hackathon teams win because they understood the problem and made sharp
-              trade-offs — not because someone handed them code. Frost is built around that.
+              trade-offs — not because someone handed them code. Mewrin is built around that.
             </p>
             <div className="mt-6">
               <Button href="/mentor">Start mentoring</Button>

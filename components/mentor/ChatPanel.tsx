@@ -55,7 +55,7 @@ export function ChatPanel({
       <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
         <MentorCompanion mood={loading ? "thinking" : "idle"} size="sm" />
         <div>
-          <div className="text-sm font-semibold text-ink">Ask Frost</div>
+          <div className="text-sm font-semibold text-ink">Ask Mewrin</div>
           <div className="text-[11px] text-ink-soft">Grounded in this project</div>
         </div>
       </div>

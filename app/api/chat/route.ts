@@ -56,7 +56,8 @@ export async function POST(req: Request) {
   try {
     const reply = await chatCompletion(
       [{ role: "system", content: system }, ...recent],
-      { temperature: 0.6, timeoutMs: 45_000, maxTokens: 1200 }
+      // Headroom for models that spend tokens "thinking" before replying.
+      { temperature: 0.6, timeoutMs: 60_000, maxTokens: 4000 }
     );
     return NextResponse.json({ reply });
   } catch (err) {

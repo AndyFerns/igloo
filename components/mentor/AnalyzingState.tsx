@@ -21,7 +21,7 @@ export function AnalyzingState() {
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-6 py-24 text-center">
       <MentorCompanion mood="thinking" size="lg" />
-      <h2 className="mt-6 text-lg font-semibold tracking-tight text-ink">Frost is thinking…</h2>
+      <h2 className="mt-6 text-lg font-semibold tracking-tight text-ink">Mewrin is thinking…</h2>
       <p className="mt-1 text-sm text-ink-soft">This usually takes 10–25 seconds.</p>
 
       <div className="mt-8 w-full space-y-2.5 text-left">

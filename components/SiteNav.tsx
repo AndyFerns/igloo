@@ -8,7 +8,7 @@ export function Wordmark() {
         <span className="absolute h-2.5 w-2.5 rounded-[3px] bg-accent transition-transform group-hover:rotate-45" />
       </span>
       <span className="text-[17px] font-semibold tracking-tight text-ink">
-        Frost<span className="text-ink-faint font-normal"> · mentor</span>
+        Mewrin<span className="text-ink-faint font-normal"> · mentor</span>
       </span>
     </Link>
   );

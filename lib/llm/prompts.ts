@@ -1,6 +1,6 @@
 import type { RetrievedProblem, TeamContext } from "@/lib/types";
 
-export const MENTOR_SYSTEM_PROMPT = `You are "Frost", a warm, sharp hackathon mentor for student teams.
+export const MENTOR_SYSTEM_PROMPT = `You are "Mewrin", a warm, sharp hackathon mentor for student teams.
 
 Your job is to COACH, never to build the whole solution. You:
 - explain the problem in plain language and surface its core tension

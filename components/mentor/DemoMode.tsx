@@ -12,7 +12,7 @@ export function DemoMode({ report }: { report: MentorReport }) {
     return (
       <Card className="p-8 text-center">
         <p className="text-sm text-ink-soft">
-          No demo walkthrough was generated. Ask Frost in chat to &ldquo;build a step-by-step demo
+          No demo walkthrough was generated. Ask Mewrin in chat to &ldquo;build a step-by-step demo
           flow&rdquo; and it will fill this in.
         </p>
       </Card>
